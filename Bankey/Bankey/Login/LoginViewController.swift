@@ -153,12 +153,12 @@ extension LoginViewController {
             return
         }
         
-//        if username.isEmpty || password.isEmpty {
-//            configureView(withMessage: "Username / password cannot be blank")
-//            return
-//        }
+        if username.isEmpty || password.isEmpty {
+            configureView(withMessage: "Username / password cannot be blank")
+            return
+        }
         
-        if username == "" && password == "" {
+        if username == "Flynn" && password == "Welcome" {
             signInButton.configuration?.showsActivityIndicator = true
             delegate?.didLogin()
         } else {
@@ -169,6 +169,18 @@ extension LoginViewController {
     private func configureView(withMessage message: String) {
         errorMessageLabel.isHidden = false
         errorMessageLabel.text = message
+        shakeButton()
+    }
+    
+    private func shakeButton() {
+        let animation = CAKeyframeAnimation()
+        animation.keyPath = "position.x"
+        animation.values = [0, 10, -10, 10, 0]
+        animation.keyTimes = [0, 0.16, 0.5, 0.83, 1]
+        animation.duration = 0.4
+        
+        animation.isAdditive = true
+        signInButton.layer.add(animation, forKey: "shake")
     }
 }
 
@@ -176,23 +188,23 @@ extension LoginViewController {
     private func animate() {
         let duration: Double = 1
         
-        let animator1 = UIViewPropertyAnimator(duration: duration, curve: .easeInOut) {
+        let animator1 = UIViewPropertyAnimator(duration: duration, curve: .easeIn) {
             self.titleLeadingAnchor?.constant = self.leadingEdgeOnScreen
             self.view.layoutIfNeeded()
         }
         animator1.startAnimation()
         
-        let animator2 = UIViewPropertyAnimator(duration: duration * 0.25, curve: .easeInOut) {
+        let animator2 = UIViewPropertyAnimator(duration: duration * 0.35, curve: .easeIn) {
             self.subtitleLeadingAnchor?.constant = self.leadingEdgeOnScreen
             self.view.layoutIfNeeded()
         }
         animator2.startAnimation(afterDelay: duration * 0.75)
         
-        let animator3 = UIViewPropertyAnimator(duration: duration, curve: .easeInOut) {
+        let animator3 = UIViewPropertyAnimator(duration: duration * 0.5, curve: .easeInOut) {
             self.titleLabel.alpha = 1
             self.subtitleLabel.alpha = 1
             self.view.layoutIfNeeded()
         }
-        animator3.startAnimation(afterDelay: duration * 0.5)
+        animator3.startAnimation(afterDelay: duration * 0.8)
     }
 }
