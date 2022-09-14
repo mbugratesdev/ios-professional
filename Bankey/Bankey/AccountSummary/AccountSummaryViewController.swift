@@ -9,20 +9,25 @@ import UIKit
 
 class AccountSummaryViewController: UIViewController {
     
-    struct Profile {
-        let firstName: String
-        let lastName: String
-    }
-    
-    var profile: Profile?
     var accounts: [AccountSummaryCell.ViewModel] = []
-    
+
     let headerView = AccountSummaryHeaderView(frame: .zero)
     var tableView = UITableView()
+
+    lazy var logoutBarButtonItem: UIBarButtonItem = {
+        let barButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(logoutTapped))
+        barButtonItem.tintColor = .label
+        return barButtonItem
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        setupNavigationBar()
+    }
+    
+    private func setupNavigationBar() {
+        navigationItem.rightBarButtonItem = logoutBarButtonItem
     }
 }
 
@@ -87,7 +92,6 @@ extension AccountSummaryViewController: UITableViewDelegate {
 extension AccountSummaryViewController {
     private func fetchData() {
         fetchAccounts()
-        fetchProfile()
     }
     
     private func fetchAccounts() {
@@ -117,8 +121,11 @@ extension AccountSummaryViewController {
         accounts.append(investment1)
         accounts.append(investment2)
     }
-    
-    private func fetchProfile() {
-        profile = Profile(firstName: "Kevin", lastName: "Smith")
+}
+
+//MARK: - Actions
+extension AccountSummaryViewController {
+    @objc func logoutTapped(sender: UIButton) {
+        NotificationCenter.default.post(name: .logout, object: nil)
     }
 }
