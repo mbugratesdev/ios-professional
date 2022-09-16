@@ -161,9 +161,8 @@ extension AccountSummaryViewController {
             switch result {
             case .success(let profile):
                 self.profile = profile
-//                self.configureTableHeaderView(with: profile)
             case .failure(let error):
-                print(error.localizedDescription)
+                self.displayError(error)
             }
             group.leave()
         }
@@ -175,7 +174,7 @@ extension AccountSummaryViewController {
                 self.accounts = accounts
                 self.configureAccountCells(with: accounts)
             case .failure(let error):
-                print(error.localizedDescription)
+                self.displayError(error)
             }
             group.leave()
         }
@@ -188,7 +187,6 @@ extension AccountSummaryViewController {
             self.isLoaded = true
 
             self.configureTableHeaderView(with: profile)
-            
             self.tableView.reloadData()
         }
     }
@@ -199,6 +197,32 @@ extension AccountSummaryViewController {
                                                 accountName: account.name,
                                                 balance: account.amount)
         }
+    }
+    
+    private func showErrorAlert(withTitle title: String = "Network Error",
+                                withMessage message: String = "Please check your network connectivity and try again.") {
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func displayError(_ error: NetworkError) {
+        let title: String
+        let message: String
+        switch error {
+        case .decodingError:
+            title = "Decoding Error"
+            message = "We could not process your request. Please try again."
+        case .serverError:
+            title = "Server Error"
+            message = "Ensure you are connected to the internet. Please try again."
+        case .urlError:
+            title = "URL Error"
+            message = "Invalid URL. Please contact with our team."
+        }
+        self.showErrorAlert(withTitle: title, withMessage: message)
     }
     
     private func configureTableHeaderView(with profile: Profile) {
