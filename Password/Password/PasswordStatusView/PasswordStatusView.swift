@@ -21,7 +21,7 @@ class PasswordStatusView: UIView {
     let specialCharacterCriteriaView = PasswordCriteriaView(text: "special character (e.g. !@#$%)")
     
     // Used to determine if we reset criteria back to empty state
-    private var shouldResetCriteria = true
+    var shouldResetCriteria = true
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -121,6 +121,33 @@ extension PasswordStatusView {
             specialCharactersMet
             ? specialCharacterCriteriaView.isCriteriaMet = true
             : specialCharacterCriteriaView.reset()
+        } else {
+            lengthCriteriaView.isCriteriaMet = lengthAndNoSpaceMet
+            uppercaseCriteriaView.isCriteriaMet = uppercaseMet
+            lowercaseCriteriaView.isCriteriaMet = lowercaseMet
+            digitCriteriaView.isCriteriaMet = digitMet
+            specialCharacterCriteriaView.isCriteriaMet = specialCharactersMet
         }
+    }
+    
+    func reset() {
+        lengthCriteriaView.reset()
+        uppercaseCriteriaView.reset()
+        lowercaseCriteriaView.reset()
+        digitCriteriaView.reset()
+        specialCharacterCriteriaView.reset()
+    }
+    
+    func validate(_ text: String) -> Bool {
+        let uppercaseMet = PasswordCriteria.uppercaseMet(text)
+        let lowercaseMet = PasswordCriteria.lowercaseMet(text)
+        let digitMet = PasswordCriteria.digitMet(text)
+        let specialCharactersMet = PasswordCriteria.specialCharactersMet(text)
+        
+        let checkable = [uppercaseMet, lowercaseMet, digitMet, specialCharactersMet]
+        
+        let lengthAndNoSpaceMet = PasswordCriteria.lengthAndNoSpaceMet(text)
+
+        return checkable.filter{$0}.count >= 3 && lengthAndNoSpaceMet
     }
 }

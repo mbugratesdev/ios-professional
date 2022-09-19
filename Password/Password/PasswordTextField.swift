@@ -9,18 +9,33 @@ import UIKit
 
 protocol PasswordTextFieldDelegate: AnyObject {
     func editingChanged(_ sender: PasswordTextField)
+    func editingDidEnd(_ sender: PasswordTextField)
 }
 
 class PasswordTextField: UIView {
     
+    /**
+     A function one passes in to do custom validation on the text field
+     
+     - Parameter: textValue: the value of text to validate
+     - Returns: A Bool indication whether text is valid, and if not a String containing an error message
+     */
+    typealias CustomValidation = (_ textValue: String?) -> (Bool, String)?
+    
     let lockImageView = UIImageView(image: UIImage(systemName: "lock.fill"))
     let textField = UITextField()
-    let placeHolderText: String
     let eyeButton = UIButton(type: .custom)
     let dividerView = UIView()
     let errorLabel = UILabel()
     
+    let placeHolderText: String
+    var customValidation: CustomValidation?
     weak var delegate: PasswordTextFieldDelegate?
+    
+    var text: String? {
+        get { textField.text }
+        set { textField.text = newValue }
+    }
     
     init(placeHolderText: String) {
         self.placeHolderText = placeHolderText
@@ -49,7 +64,7 @@ extension PasswordTextField {
         
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.isSecureTextEntry = false // true
-//        textField.delegate = self
+        textField.delegate = self
         textField.keyboardType = .asciiCapable
         textField.attributedPlaceholder = NSAttributedString(string: placeHolderText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
         
@@ -98,7 +113,7 @@ extension PasswordTextField {
             eyeButton.trailingAnchor.constraint(equalTo: trailingAnchor),
             eyeButton.leadingAnchor.constraint(equalToSystemSpacingAfter: textField.trailingAnchor, multiplier: 1),
         ])
-
+        
         // Divider
         NSLayoutConstraint.activate([
             dividerView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -124,7 +139,16 @@ extension PasswordTextField {
 //MARK: - UITextFieldDelegate
 
 extension PasswordTextField: UITextFieldDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        delegate?.editingDidEnd(self)
+    }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // Resign first responder
+        textField.endEditing(true)
+        
+        return true
+    }
 }
 
 //MARK: - Actions
@@ -139,3 +163,27 @@ extension PasswordTextField {
     }
 }
 
+//MARK: - Validation
+
+extension PasswordTextField {
+    func validate() -> Bool {
+        if let customValidation = customValidation,
+           let customValidationResult = customValidation(text),
+           customValidationResult.0 == false {
+            showError(customValidationResult.1)
+            return false
+        }
+        clearError()
+        return true
+    }
+    
+    private func showError(_ errorMessage: String) {
+        errorLabel.text = errorMessage
+        errorLabel.isHidden = false
+    }
+    
+    private func clearError() {
+        errorLabel.isHidden = true
+        errorLabel.text = ""
+    }
+}
