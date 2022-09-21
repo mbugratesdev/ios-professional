@@ -17,6 +17,8 @@ class ViewController: UIViewController {
     let confirmPasswordTextField = PasswordTextField(placeHolderText: "Re-enter new password")
     let resetButton = UIButton(type: .system)
     
+    var alert: UIAlertController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -41,7 +43,7 @@ extension ViewController {
                 self.statusView.reset()
                 return (false, "Enter your password")
             }
-
+            
             // Invalid Character Check
             // It is different from special character criteria.
             // In invalid character check we don't allow user to user certain characters
@@ -180,7 +182,7 @@ extension ViewController {
         view.endEditing(true)
     }
     
-    @objc private func resetPasswordButtonTapped(sender: UIButton) {
+    @objc func resetPasswordButtonTapped(sender: UIButton) {
         view.endEditing(true)
         
         let isValidNewPassword = newPasswordTextField.validate()
@@ -192,10 +194,27 @@ extension ViewController {
     }
     
     private func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        guard let alert = alert else {return}
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         
+        alert.title = title
+        alert.message = message
+        
         present(alert, animated: true, completion: nil)
+    }
+}
+
+// MARK: Tests
+extension ViewController {
+    var newPasswordText: String? {
+        get { return newPasswordTextField.text }
+        set { newPasswordTextField.text = newValue}
+    }
+    
+    var confirmPasswordText: String? {
+        get { return confirmPasswordTextField.text }
+        set { confirmPasswordTextField.text = newValue}
     }
 }
 

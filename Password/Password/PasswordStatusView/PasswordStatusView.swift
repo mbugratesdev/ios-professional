@@ -151,3 +151,18 @@ extension PasswordStatusView {
         return checkable.filter{$0}.count >= 3 && lengthAndNoSpaceMet
     }
 }
+
+// MARK: Tests
+extension PasswordCriteriaView {
+    var isCheckMarkImage: Bool {
+        return imageView.image == checkmarkImage
+    }
+
+    var isXmarkImage: Bool {
+        return imageView.image == xmarkImage
+    }
+
+    var isResetImage: Bool {
+        return imageView.image == circleImage
+    }
+}
